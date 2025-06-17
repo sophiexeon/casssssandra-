@@ -1,0 +1,74 @@
+# docker-compose.yml
+#docker-compose up 
+
+networks:
+  cassandra:
+    driver: bridge
+
+services:
+  # seed node for cluster 
+  cassandra1:
+    image: cassandra:4.1
+    container_name: cassandra1
+    ports:
+      - "9042:9042"
+    environment:
+      - CASSANDRA_CLUSTER_NAME=FlightCluster
+      - CASSANDRA_SEEDS=cassandra1
+      - CASSANDRA_AUTH_ENABLED=false
+      - MAX_HEAP_SIZE=256M
+      - HEAP_NEWSIZE=64M
+    volumes:
+      - data1:/var/lib/cassandra
+    # tmpfs:
+    #   - /var/lib/cassandra:size=256M
+    networks:
+      - cassandra
+
+  cassandra2:
+    image: cassandra:4.1
+    container_name: cassandra2
+    ports:
+      - "9043:9042"
+    environment:
+      - CASSANDRA_CLUSTER_NAME=FlightCluster
+      - CASSANDRA_SEEDS=cassandra1
+      - CASSANDRA_AUTH_ENABLED=false
+      - MAX_HEAP_SIZE=256M
+      - HEAP_NEWSIZE=64M
+    depends_on:
+      - cassandra1
+    volumes:
+      - data2:/var/lib/cassandra
+    networks:
+      - cassandra
+#     #restart: unless-stopped
+
+  cassandra3:
+    image: cassandra:4.1
+    container_name: cassandra3
+    ports:
+      - "9044:9042"
+    environment:
+      - CASSANDRA_CLUSTER_NAME=FlightCluster
+      - CASSANDRA_SEEDS=cassandra1
+      - CASSANDRA_AUTH_ENABLED=false
+      - MAX_HEAP_SIZE=256M
+      - HEAP_NEWSIZE=64M
+    depends_on:
+      - cassandra1
+    volumes:
+      - data3:/var/lib/cassandra
+    networks:
+      - cassandra
+
+volumes:
+  data1:
+  data2:
+  data3:
+
+#corrected
+#expose ports
+#memory issues (size)
+#volumes issues 
+
